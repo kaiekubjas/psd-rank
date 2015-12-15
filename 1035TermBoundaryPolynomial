@@ -1,0 +1,37 @@
+interface(quiet=true): with(linalg):
+
+# We consider only quadrics that pass through the three coordinate points
+# a1 :=  1: a2 := 0: a3 := 0:
+# b1 :=  0: b2 := 1: b3 := 0:
+# c1 :=  0: c2 := 0: c3 := 1:
+x11 := 0: x22 := 0: x33 := 0:
+
+# We parametrize such quadrics by the following three indeterminate coefficients
+x12 := x: x13 := y: x23 := z:
+
+# The condition for the quadric to be tangent to the line given by [d1,d2,d3] is
+p1 := -x23^2*d1^2+x22*x33*d1^2+2*x13*x23*d1*d2-2*x12*x33*d1*d2-x13^2*d2^2+x11*x33*d2^2-2*x13*x22*d1*d3+2*x12*x23*d1*d3+2*x12*x13*d2*d3-2*x11*x23*d2*d3-x12^2*d3^2+x11*x22*d3^2;
+# The condition for the quadric to be tangent to the line given by [e1,e2,e3] is
+p2 := -x23^2*e1^2+x22*x33*e1^2+2*x13*x23*e1*e2-2*x12*x33*e1*e2-x13^2*e2^2+x11*x33*e2^2-2*x13*x22*e1*e3+2*x12*x23*e1*e3+2*x12*x13*e2*e3-2*x11*x23*e2*e3-x12^2*e3^2+x11*x22*e3^2;
+# The condition for the quadric to be tangent to the line given by [f1,f2,f3] is
+p3 := -x23^2*f1^2+x22*x33*f1^2+2*x13*x23*f1*f2-2*x12*x33*f1*f2-x13^2*f2^2+x11*x33*f2^2-2*x13*x22*f1*f3+2*x12*x23*f1*f3+2*x12*x13*f2*f3-2*x11*x23*f2*f3-x12^2*f3^2+x11*x22*f3^2;
+
+# Now,  p1,p2,p3 are three homogeneous quadrics in three unknowns x,y,z, whose 
+# coefficients are quadrics in d1,d2,....,f3. We now eliminate x,y,z using the 
+# formula in equation (4.5) on page 48 of http://math.berkeley.edu/~bernd/cbms.pdf
+
+J := factor(sort(collect(det(jacobian([p1,p2,p3],[x,y,z])),[x,y,z],distributed))):
+q1 := sort(collect(diff(J,x),[x,y,z],distributed)):
+q2 := sort(collect(diff(J,y),[x,y,z],distributed)):
+q3 := sort(collect(diff(J,z),[x,y,z],distributed)):
+
+L := []:
+for q in [p1,p2,p3,q1,q2,q3] do
+L := [L[],[diff(diff(q,x),x),diff(diff(q,x),y),diff(diff(q,x),z),
+           diff(diff(q,y),y),diff(diff(q,y),z),diff(diff(q,z),z)]]:
+od:
+
+R := det(array(L)): R := sort(R/content(R)):
+lprint(R);
+nops(R),degree(R);
+
